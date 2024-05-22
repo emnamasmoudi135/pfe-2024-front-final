@@ -1,0 +1,50 @@
+/* src/styles/Card.css */
+.card {
+  background-color: #557FB9 !important; /* Bleu roi très foncé */
+  color: white !important;
+  padding: 20px !important;
+  border-radius: 10px !important;
+  text-align: center !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  width: 250px !important;
+  margin: 20px !important;
+}
+
+.card .icon-container {
+  font-size: 40px !important;
+  margin-bottom: 10px !important;
+}
+
+.card button {
+  background-color: #ff7f50 !important; /* Couleur du bouton */
+  border: none !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  font-size: 16px !important;
+  margin-top: 10px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+}
+
+.card button:hover {
+  background-color: #ff6347 !important; /* Couleur du bouton au survol */
+}
+
+.home {
+  background-size: cover !important;
+  background-position: center !important;
+  height: 100vh !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-direction: column !important;
+}
+
+.card-container {
+  display: flex !important;
+  gap: 20px !important;
+  justify-content: center !important;
+}
