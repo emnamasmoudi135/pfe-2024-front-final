@@ -2,9 +2,24 @@ import React, { useEffect, useState } from 'react';
 import proxmoxService from 'src/services/proxmoxService';
 import VMCard from 'src/components/VMCard';
 import VMDetails from 'src/components/VMDetails';
-import { Container, Grid, Button, Modal, TextField, Box, Typography } from '@mui/material';
+import { Container, Grid, Button, Modal, TextField, Box, Typography, Paper } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
+import { Line, Pie, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import 'react-toastify/dist/ReactToastify.css';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const Proxmox = () => {
   const [vms, setVms] = useState([]);
@@ -25,7 +40,8 @@ const Proxmox = () => {
     sockets: 1,
     scsihw: 'virtio-scsi-pci'
   });
-  const node = 'proxmox-server'; // Update with the actual node name
+  const [nodeStatistics, setNodeStatistics] = useState(null);
+  const node = 'proxmox-server';
 
   const fetchVMs = async () => {
     const response = await proxmoxService.listVMs(node);
@@ -38,8 +54,18 @@ const Proxmox = () => {
     }
   };
 
+  const fetchNodeStatistics = async () => {
+    const response = await proxmoxService.getNodeStatistics(node);
+    if (response) {
+      setNodeStatistics(response);
+    } else {
+      alert('Failed to fetch node statistics');
+    }
+  };
+
   useEffect(() => {
     fetchVMs();
+    fetchNodeStatistics();
   }, [node]);
 
   useEffect(() => {
@@ -57,18 +83,68 @@ const Proxmox = () => {
     if (response && response[0] === true) {
       setShowCreateModal(false);
       toast.success('VM created successfully!');
-      fetchVMs(); // Refresh the VM list
+      fetchVMs();
     } else {
       console.error('Failed to create VM');
       toast.error('Failed to create VM');
     }
   };
 
+  const generateChartData = () => {
+    if (!nodeStatistics) return {};
+
+    return {
+      cpuUsage: {
+        labels: ['CPU Usage'],
+        datasets: [
+          {
+            label: 'CPU Usage',
+            data: [nodeStatistics.cpu * 100], // Convert to percentage
+            backgroundColor: '#e83e8c',
+            borderColor: '#e83e8c',
+            borderWidth: 1,
+          },
+        ],
+      },
+      memoryUsage: {
+        labels: ['Used', 'Free'],
+        datasets: [
+          {
+            label: 'Memory Usage',
+            data: [nodeStatistics.memory.used, nodeStatistics.memory.free],
+            backgroundColor: ['#e83e8c', '#3664AD'],
+            borderColor: ['#e83e8c', '#3664AD'],
+            borderWidth: 1,
+          },
+        ],
+      },
+      swapUsage: {
+        labels: ['Used', 'Free'],
+        datasets: [
+          {
+            label: 'Swap Usage',
+            data: [nodeStatistics.swap.used, nodeStatistics.swap.free],
+            backgroundColor: ['#e83e8c', '#3664AD'],
+            borderColor: ['#e83e8c', '#3664AD'],
+            borderWidth: 1,
+          },
+        ],
+      },
+    };
+  };
+
+  const { cpuUsage, memoryUsage, swapUsage } = generateChartData();
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false
+  };
+
   return (
     <Container>
       {!selectedVM && (
         <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-          <Grid item xs={12} sm={6} md={4}>
+           <Grid item xs={12} sm={6} md={4}>
             <TextField
               label="Search VM"
               variant="outlined"
@@ -91,16 +167,49 @@ const Proxmox = () => {
       {selectedVM ? (
         <VMDetails selectedVM={selectedVM} refreshVMs={fetchVMs} onBack={() => setSelectedVM(null)} />
       ) : (
-        <Grid container spacing={2} mt={2} justifyContent="center">
-          {filteredVMs.map(vm => (
-            <Grid item xs={12} sm={6} md={4} key={vm.vmid}>
-              <VMCard vm={vm} onSelectVM={handleSelectVM} />
-            </Grid>
-          ))}
-        </Grid>
+        <>
+          {nodeStatistics && (
+            <>
+              <Grid container spacing={2} mt={4}>
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 2, borderRadius: '15px', height: '300px' }}>
+                    <Typography variant="h6">CPU Usage</Typography>
+                    <Box sx={{ height: '240px' }}>
+                      <Bar data={cpuUsage} options={chartOptions} />
+                    </Box>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 2, borderRadius: '15px', height: '300px' }}>
+                    <Typography variant="h6">Memory Usage</Typography>
+                    <Box sx={{ height: '240px' }}>
+                      <Pie data={memoryUsage} options={chartOptions} />
+                    </Box>
+                  </Paper>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} mt={2}>
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 2, borderRadius: '15px', height: '300px' }}>
+                    <Typography variant="h6">Swap Usage</Typography>
+                    <Box sx={{ height: '240px' }}>
+                      <Pie data={swapUsage} options={chartOptions} />
+                    </Box>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </>
+          )}
+          <Grid container spacing={2} mt={2}>
+            {filteredVMs.map(vm => (
+              <Grid item xs={12} sm={6} md={4} key={vm.vmid}>
+                <VMCard vm={vm} onSelectVM={handleSelectVM} />
+              </Grid>
+            ))}
+          </Grid>
+        </>
       )}
       <ToastContainer />
-
       {/* Create VM Modal */}
       <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)}>
         <Box sx={{ p: 4, backgroundColor: 'white', borderRadius: '8px', width: '400px', margin: 'auto', mt: '10%' }}>
@@ -135,8 +244,8 @@ const Proxmox = () => {
             onChange={(e) => setCreateData({ ...createData, memory: e.target.value })}
           />
           <Box mt={2}>
-            <Button variant="contained"  sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={handleCreateVM}>Create VM</Button>
-            <Button variant="contained"  sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }}  onClick={() => setShowCreateModal(false)}>Cancel</Button>
+            <Button variant="contained" sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={handleCreateVM}>Create VM</Button>
+            <Button variant="contained" sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }} onClick={() => setShowCreateModal(false)}>Cancel</Button>
           </Box>
         </Box>
       </Modal>

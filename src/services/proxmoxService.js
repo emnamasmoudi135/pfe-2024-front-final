@@ -82,6 +82,17 @@ const stopVM = async (node, vmid) => {
     }
 };
 
+
+const getNodeStatistics = async (node) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/proxmox/nodes/${node}/statistics`);
+        return response.data;
+    } catch (error) {
+        console.error('Fetching node statistics failed:', error);
+        return null;
+    }
+};
+
 export default {
     loginProxmox,
     listVMs,
@@ -91,4 +102,5 @@ export default {
     getVMStatus,
     startVM,
     stopVM,
+    getNodeStatistics,
 };
