@@ -9,9 +9,10 @@ const VMCard = ({ vm, onSelectVM }) => {
         <Typography variant="body2">
           <strong>Status:</strong> {vm.status}
         </Typography>
+        
         <Button 
           onClick={() => onSelectVM(vm)} 
-          sx={{ backgroundColor: '#6CC51D', color: 'white', marginTop: '1rem', '&:hover': { backgroundColor: '#5ba914' } }}
+          sx={{ backgroundColor: '#3664AD', color: 'white', marginTop: '1rem', '&:hover': { backgroundColor: '#3664AD' } }}
         >
           View Details
         </Button>

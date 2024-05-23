@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import proxmoxService from 'src/services/proxmoxService';
-import { Container, Typography, Button, Grid, Modal, TextField, Box, Paper } from '@mui/material';
+import { Container, Typography, Button, Grid, Modal, TextField, Box, Paper, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Line, Pie, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { toast } from 'react-toastify';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';import { toast } from 'react-toastify';
+import VirtualMachineIcon from '@mui/icons-material/Computer'; // Utilisez l'icône de machine virtuelle appropriée
 import 'react-toastify/dist/ReactToastify.css';
 
 // Register necessary components for chart.js
@@ -16,7 +17,8 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
@@ -41,6 +43,7 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
         if (response && response[0] === true) {
           const details = response[1];
           setVmDetails(details);
+
           const labels = ['Current']; // Static label for current data point
 
           setCpuUsageData({
@@ -48,9 +51,9 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
             datasets: [
               {
                 label: 'CPU Usage',
-                data: [details.cpu * 100], // Convert to percentage
-                borderColor: 'rgba(75,192,192,1)',
-                backgroundColor: 'rgba(75,192,192,0.6)',
+                data: [details.cpu * 100 || 0], // Convert to percentage and handle undefined
+                borderColor: '#3664AD',
+                backgroundColor: 'rgba(54, 100, 173, 0.6)',
                 fill: true,
               }
             ]
@@ -60,9 +63,9 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
             datasets: [
               {
                 label: 'Memory Usage',
-                data: [(details.mem / details.maxmem) * 100], // Convert to percentage
-                borderColor: 'rgba(153,102,255,1)',
-                backgroundColor: 'rgba(153,102,255,0.6)',
+                data: [(details.mem / details.maxmem) * 100 || 0], // Convert to percentage and handle undefined
+                borderColor: '#e83e8c',
+                backgroundColor: 'rgba(232, 62, 140, 0.6)',
                 fill: true,
               }
             ]
@@ -72,9 +75,9 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
             datasets: [
               {
                 label: 'Disk Usage',
-                data: [(details.disk / details.maxdisk) * 100], // Convert to percentage
-                borderColor: 'rgba(255,159,64,1)',
-                backgroundColor: 'rgba(255,159,64,0.6)',
+                data: [(details.disk / details.maxdisk) * 100 || 0], // Convert to percentage and handle undefined
+                borderColor: '#3664AD',
+                backgroundColor: 'rgba(54, 100, 173, 0.6)',
                 fill: true,
               }
             ]
@@ -118,34 +121,87 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
 
   return (
     <Container>
-      <Button variant="contained" onClick={onBack} sx={{ mb: 2 }}>
-        Back
-      </Button>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <IconButton onClick={onBack} sx={{ color: '#3664AD' }}>
+          <ArrowBackIosIcon sx={{ fontSize: '2rem' }} />
+        </IconButton>
+        <Typography variant="h6" sx={{ color: '#3664AD', ml: 1 }}>Back</Typography>
+      </Box>
       {vmDetails ? (
         <Grid container spacing={2}>
           <Grid item xs={12}>
+            <Paper sx={{ p: 3, borderRadius: '15px', backgroundColor: '#e83e8c', color: 'white' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <VirtualMachineIcon sx={{ fontSize: '2rem', mr: 1 }} />
+                <Typography variant="h4" gutterBottom>{selectedVM.name} Summary</Typography>
+              </Box>
+            </Paper>
             <Paper sx={{ p: 3, borderRadius: '15px' }}>
-              <Typography variant="h4" gutterBottom>{selectedVM.name} Summary</Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong> {vmDetails.status}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Node:</strong> {selectedVM.node}
-              </Typography>
-              <Typography variant="body1">
-                <strong>CPU Usage:</strong> {(vmDetails.cpu * 100).toFixed(2)}%
-              </Typography>
-              <Typography variant="body1">
-                <strong>Memory Usage:</strong> {((vmDetails.mem / vmDetails.maxmem) * 100).toFixed(2)}%
-              </Typography>
-              <Typography variant="body1">
-                <strong>Disk Usage:</strong> {((vmDetails.disk / vmDetails.maxdisk) * 100).toFixed(2)}%
-              </Typography>
+              <TableContainer>
+                <Table>
+           
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Status</TableCell>
+                      <TableCell>{vmDetails.status}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Node</TableCell>
+                      <TableCell>{selectedVM.node}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>CPU Usage</TableCell>
+                      <TableCell>{(vmDetails.cpu * 100).toFixed(2)}%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Memory Usage</TableCell>
+                      <TableCell>{((vmDetails.mem / vmDetails.maxmem) * 100).toFixed(2)}%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Disk Usage</TableCell>
+                      <TableCell>{((vmDetails.disk / vmDetails.maxdisk) * 100).toFixed(2)}%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Max Disk</TableCell>
+                      <TableCell>{vmDetails.maxdisk}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Max Memory</TableCell>
+                      <TableCell>{vmDetails.maxmem}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Network In</TableCell>
+                      <TableCell>{vmDetails.netin}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Network Out</TableCell>
+                      <TableCell>{vmDetails.netout}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Uptime</TableCell>
+                      <TableCell>{vmDetails.uptime}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>CPUs</TableCell>
+                      <TableCell>{vmDetails.cpus}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Disk Read</TableCell>
+                      <TableCell>{vmDetails.diskread}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Disk Write</TableCell>
+                      <TableCell>{vmDetails.diskwrite}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
               <Box mt={2}>
-                <Button variant="contained" onClick={() => setShowUpdateModal(true)} sx={{ mr: 2 }}>
+                <Button variant="contained" sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }} onClick={() => setShowUpdateModal(true)}>
                   Update VM
                 </Button>
-                <Button variant="contained" color="error" onClick={() => setShowDeleteModal(true)}>
+                
+                <Button variant="contained" sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c'} }} onClick={() => setShowDeleteModal(true)}>
                   Delete VM
                 </Button>
               </Box>
@@ -154,7 +210,7 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, borderRadius: '15px' }}>
               <Typography variant="h6">CPU Usage</Typography>
-              <Line data={cpuUsageData} />
+              <Bar data={cpuUsageData} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -166,7 +222,7 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, borderRadius: '15px' }}>
               <Typography variant="h6">Disk Usage</Typography>
-              <Pie data={diskUsageData} />
+              <Line data={diskUsageData} />
             </Paper>
           </Grid>
         </Grid>
@@ -195,8 +251,10 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
             onChange={(e) => setUpdateData({ ...updateData, memory: e.target.value })}
           />
           <Box mt={2}>
-            <Button variant="contained" color="primary" onClick={handleUpdateVM} sx={{ mr: 2 }}>Update VM</Button>
-            <Button variant="contained" onClick={() => setShowUpdateModal(false)}>Cancel</Button>
+            <Button variant="contained" sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#2d538d' }, mr: 2 }} onClick={handleUpdateVM}>
+              Update VM
+            </Button>
+            <Button variant="contained"  sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={() => setShowUpdateModal(false)}>Cancel</Button>
           </Box>
         </Box>
       </Modal>
@@ -212,8 +270,10 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
             onChange={(e) => setDeleteConfirmation(e.target.value)}
           />
           <Box mt={2}>
-            <Button variant="contained" color="error" onClick={handleDeleteVM} sx={{ mr: 2 }}>Delete VM</Button>
-            <Button variant="contained" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+            <Button variant="contained" sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={handleDeleteVM}>
+              Delete VM
+            </Button>
+            <Button variant="contained"  sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }}  onClick={() => setShowDeleteModal(false)}>Cancel</Button>
           </Box>
         </Box>
       </Modal>

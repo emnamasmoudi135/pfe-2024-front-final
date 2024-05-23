@@ -12,7 +12,7 @@ const CustomCard = ({ icon, title, description, buttonText, onClick }) => {
         <BootstrapCard.Text>{description}</BootstrapCard.Text>
         <Button 
           onClick={onClick} 
-          style={{ backgroundColor: '#6CC51D', borderColor: '#6CC51D' }}
+          style={{ backgroundColor: '#3664AD', borderColor: '#3664AD' }}
         >
           {buttonText}
         </Button>

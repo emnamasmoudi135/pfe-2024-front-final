@@ -26,13 +26,13 @@ const NavItem = ({ item, level, pathDirect, onClick }) => {
     paddingLeft: '10px',
     '&:hover': {
       backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.main,
+      color: '#3664AD',
     },
     '&.Mui-selected': {
       color: 'white',
-      backgroundColor: '#6CC51D', // Change this to your desired color
+      backgroundColor: '#3664AD ', // Change this to your desired color
       '&:hover': {
-        backgroundColor: '#6CC51D', // Change this to your vert color 
+        backgroundColor: '#3664AD ', // Change this to your vert color 
         color: 'white',
       },
     },

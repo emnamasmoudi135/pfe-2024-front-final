@@ -1,26 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LogoImage from 'src/assets/images/logos/logo.png'; // Assurez-vous que le chemin est correct
-import { styled } from '@mui/material';
+import { styled, Box } from '@mui/material';
 
-const LinkStyled = styled(Link)(() => ({
-  height: '70px',
-  width: '180px',
+const LinkStyled = styled(Link)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100px',
+  width: '100%',
   overflow: 'hidden',
-  display: 'block',
+  margin: theme.spacing(2, 0),
 }));
 
 const ImgStyled = styled('img')(() => ({
   height: '100%',
-  width: '100%',
+  width: 'auto',
   objectFit: 'contain',
 }));
 
 const Logo = () => {
   return (
-    <LinkStyled to="/">
-      <ImgStyled src={LogoImage} alt="Logo" />
-    </LinkStyled>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <LinkStyled to="/">
+        <ImgStyled src={LogoImage} alt="Logo" />
+      </LinkStyled>
+    </Box>
   );
 };
 

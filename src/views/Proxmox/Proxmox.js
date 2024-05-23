@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import proxmoxService from 'src/services/proxmoxService';
 import VMCard from 'src/components/VMCard';
 import VMDetails from 'src/components/VMDetails';
-import { Container, Grid, Button, Modal, TextField, Box, Typography, IconButton } from '@mui/material';
+import { Container, Grid, Button, Modal, TextField, Box, Typography } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -66,26 +66,28 @@ const Proxmox = () => {
 
   return (
     <Container>
-      <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-        <Grid item xs={12} sm={8} md={9}>
-          <TextField
-            label="Search VM"
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {!selectedVM && (
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+          <Grid item xs={12} sm={6} md={4}>
+            <TextField
+              label="Search VM"
+              variant="outlined"
+              fullWidth
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' } }}
+              onClick={() => setShowCreateModal(true)}
+            >
+              Create VM
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#5ba914' } }}
-            onClick={() => setShowCreateModal(true)}
-          >
-            Create VM
-          </Button>
-        </Grid>
-      </Grid>
+      )}
       {selectedVM ? (
         <VMDetails selectedVM={selectedVM} refreshVMs={fetchVMs} onBack={() => setSelectedVM(null)} />
       ) : (
@@ -133,8 +135,8 @@ const Proxmox = () => {
             onChange={(e) => setCreateData({ ...createData, memory: e.target.value })}
           />
           <Box mt={2}>
-            <Button variant="contained" color="primary" onClick={handleCreateVM} sx={{ mr: 2 }}>Create VM</Button>
-            <Button variant="contained" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+            <Button variant="contained"  sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={handleCreateVM}>Create VM</Button>
+            <Button variant="contained"  sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }}  onClick={() => setShowCreateModal(false)}>Cancel</Button>
           </Box>
         </Box>
       </Modal>
