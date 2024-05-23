@@ -68,7 +68,7 @@ const Menuitems = [
     id: uniqueId(),
     title: 'Ansible Managment',
     icon: IconAperture,
-    href: '/sample-page',
+    href: '/ansible',
   },
 ];
 
