@@ -100,8 +100,8 @@ const Proxmox = () => {
           {
             label: 'CPU Usage',
             data: [nodeStatistics.cpu * 100], // Convert to percentage
-            backgroundColor: '#e83e8c',
-            borderColor: '#e83e8c',
+            backgroundColor: '#d95ca9',
+            borderColor: '#d95ca9',
             borderWidth: 1,
           },
         ],
@@ -112,8 +112,8 @@ const Proxmox = () => {
           {
             label: 'Memory Usage',
             data: [nodeStatistics.memory.used, nodeStatistics.memory.free],
-            backgroundColor: ['#e83e8c', '#3664AD'],
-            borderColor: ['#e83e8c', '#3664AD'],
+            backgroundColor: ['#d95ca9', '#3664AD'],
+            borderColor: ['#d95ca9', '#3664AD'],
             borderWidth: 1,
           },
         ],
@@ -124,8 +124,8 @@ const Proxmox = () => {
           {
             label: 'Swap Usage',
             data: [nodeStatistics.swap.used, nodeStatistics.swap.free],
-            backgroundColor: ['#e83e8c', '#3664AD'],
-            borderColor: ['#e83e8c', '#3664AD'],
+            backgroundColor: ['#d95ca9', '#3664AD'],
+            borderColor: ['#d95ca9', '#3664AD'],
             borderWidth: 1,
           },
         ],
@@ -156,7 +156,7 @@ const Proxmox = () => {
           <Grid item>
             <Button
               variant="contained"
-              sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' } }}
+              sx={{ backgroundColor: '#d95ca9', color: 'white', '&:hover': { backgroundColor: '#d95ca9' } }}
               onClick={() => setShowCreateModal(true)}
             >
               Create VM
@@ -244,7 +244,7 @@ const Proxmox = () => {
             onChange={(e) => setCreateData({ ...createData, memory: e.target.value })}
           />
           <Box mt={2}>
-            <Button variant="contained" sx={{ backgroundColor: '#e83e8c', color: 'white', '&:hover': { backgroundColor: '#e83e8c' }, mr: 2 }} onClick={handleCreateVM}>Create VM</Button>
+            <Button variant="contained" sx={{ backgroundColor: '#d95ca9', color: 'white', '&:hover': { backgroundColor: '#d95ca9' }, mr: 2 }} onClick={handleCreateVM}>Create VM</Button>
             <Button variant="contained" sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' }, mr: 2 }} onClick={() => setShowCreateModal(false)}>Cancel</Button>
           </Box>
         </Box>

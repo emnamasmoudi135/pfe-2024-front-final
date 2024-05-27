@@ -18,10 +18,10 @@ const PageWrapper = styled('div')(() => ({
   paddingBottom: '60px',
   flexDirection: 'column',
   zIndex: 1,
-  backgroundColor: '#F5F9F1', // Ajoute la couleur de fond ici
+  backgroundColor: '#DFE8F6', //  couleur de fond  bleu fetah
 }));
 
-
+// '#F5F9F1'   '#EFE9F2'   
 const FullLayout = () => {
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);

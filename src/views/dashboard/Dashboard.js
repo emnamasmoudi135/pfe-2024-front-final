@@ -16,6 +16,10 @@ const Dashboard = () => {
     }
   };
 
+  const handleansible = async () => {
+      navigate('/ansible');   
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
       <div className="d-flex justify-content-center flex-wrap">
@@ -24,7 +28,7 @@ const Dashboard = () => {
           title="Ansible"
           description="Automate your IT tasks"
           buttonText="Automate"
-          onClick={() => alert('Ansible Automate')}
+          onClick={handleansible}
         />
         <CustomCard
           icon={<FaNetworkWired />}

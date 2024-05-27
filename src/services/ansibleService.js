@@ -23,6 +23,18 @@ class AnsibleService {
     }
   }
 
+  async createPlaybook(playbookName, content) {
+    try {
+      const response = await axios.post(`${BASE_URL}/add-playbook/${playbookName}`, { new_content: content });
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating playbook ${playbookName}:`, error);
+      throw error;
+    }
+  }
+
+
+
   async updatePlaybook(playbookName, content) {
     try {
       const response = await axios.put(`${BASE_URL}/modify-playbook/${playbookName}`, { new_content: content });
@@ -33,5 +45,6 @@ class AnsibleService {
     }
   }
 }
+
 
 export default new AnsibleService();
