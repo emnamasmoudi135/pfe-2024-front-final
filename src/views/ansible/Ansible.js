@@ -3,7 +3,6 @@ import { Container, Button, Grid, Paper, Typography, Box, Table, TableBody, Tabl
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreatePlaybook from './CreatePlaybook';
-import EditPlaybook from './EditPlaybook';
 import AnsibleService from '../../services/ansibleService';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 const Ansible = () => {
   const [playbooks, setPlaybooks] = useState([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [playbookContent, setPlaybookContent] = useState('');
   const [selectedPlaybook, setSelectedPlaybook] = useState('');
   const navigate = useNavigate();
@@ -30,7 +28,10 @@ const Ansible = () => {
     const content = await AnsibleService.getPlaybookDetail(playbook);
     setSelectedPlaybook(playbook);
     setPlaybookContent(content);
-    setEditModalOpen(true);
+  };
+
+  const handleEditPlaybook = (playbook) => {
+    navigate(`/edit-playbook/${playbook}`);
   };
 
   const handleSavePlaybook = async (name, content) => {
@@ -46,19 +47,7 @@ const Ansible = () => {
     }
   };
 
-  const handleUpdatePlaybook = async (content) => {
-    try {
-      await AnsibleService.updatePlaybook(selectedPlaybook, content);
-      toast.success('Playbook updated successfully!');
-      setEditModalOpen(false);
-      const data = await AnsibleService.listPlaybooks();
-      setPlaybooks(data[1]);
-    } catch (error) {
-      toast.error('Error updating playbook');
-      console.error('Error updating playbook:', error);
-      throw error; // Make sure to throw the error to trigger the toast in EditPlaybook
-    }
-  };
+ 
 
   const handleDeletePlaybook = async (playbook) => {
     try {
@@ -103,6 +92,7 @@ const Ansible = () => {
                     >
                       <TableCell>{playbook}</TableCell>
                       <TableCell align="right">
+                      <Button onClick={() => handleEditPlaybook(playbook)}>Edit</Button>
                         <IconButton onClick={(event) => { event.stopPropagation(); handleDeletePlaybook(playbook); }} sx={{ color: '#3664AD' }}>
                           <DeleteIcon />
                         </IconButton>
@@ -117,7 +107,6 @@ const Ansible = () => {
       </Grid>
 
       <CreatePlaybook open={createModalOpen} onClose={() => setCreateModalOpen(false)} onSave={handleSavePlaybook} />
-      <EditPlaybook open={editModalOpen} onClose={() => setEditModalOpen(false)} playbookContent={playbookContent} onSave={handleUpdatePlaybook} />
     </Container>
   );
 };

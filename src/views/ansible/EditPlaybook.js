@@ -1,260 +1,130 @@
-import { Modal, Paper, Typography, Box, Button, TextField, Grid, MenuItem, IconButton } from '@mui/material';
-import Editor from '@monaco-editor/react';
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { useParams, useNavigate } from 'react-router-dom';
+import AnsibleService from 'src/services/ansibleService';
+import { Paper, Typography, Box, Button, TextField } from '@mui/material';
 import yaml from 'js-yaml';
 
-const EditPlaybook = ({ open, onClose, playbookContent, onSave }) => {
-  const [content, setContent] = useState(playbookContent);
-  const [isFormModified, setIsFormModified] = useState(false);
-  const [playbook, setPlaybook] = useState({
-    name: '',
-    description: '',
-    hosts: '',
-    tasks: [{ name: '', module: '', args: '' }],
-    variables: [{ name: '', value: '' }]
-  });
+const EditPlaybook = () => {
+  const { name, editType } = useParams();
+  const [playbook, setPlaybook] = useState(null);
+  const [formFields, setFormFields] = useState({});
+  const [newContent, setNewContent] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (playbookContent) {
-      const parsedContent = yaml.load(playbookContent);
-      setPlaybook({
-        name: parsedContent.name || '',
-        description: parsedContent.description || '',
-        hosts: parsedContent.hosts || '',
-        tasks: parsedContent.tasks.map(task => ({
-          name: task.name || '',
-          module: task.module || '',
-          args: task.args || ''
-        })),
-        variables: Object.entries(parsedContent.vars || {}).map(([name, value]) => ({ name, value }))
-      });
-      setContent(playbookContent);
-    }
-  }, [playbookContent]);
+    const fetchPlaybook = async () => {
+      try {
+        const data = await AnsibleService.getPlaybookDetail(name);
+        if (data[0] && data[1]) {
+          setPlaybook(data[1]);
+          setNewContent(yaml.dump(data[1]));
+          setError(null);
+          setFormFields(data[1]);
+        } else {
+          setError('Failed to fetch playbook details');
+          console.error('Failed to fetch playbook details:', data[2]);
+        }
+      } catch (error) {
+        setError('Error fetching playbook');
+        console.error('Error fetching playbook:', error);
+      }
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPlaybook((prev) => ({ ...prev, [name]: value }));
-    setIsFormModified(true);
-  };
-
-  const handleTaskChange = (index, field, value) => {
-    const updatedTasks = [...playbook.tasks];
-    updatedTasks[index][field] = value;
-    setPlaybook((prev) => ({ ...prev, tasks: updatedTasks }));
-    setIsFormModified(true);
-  };
-
-  const handleAddTask = () => {
-    setPlaybook((prev) => ({
-      ...prev,
-      tasks: [...prev.tasks, { name: '', module: '', args: '' }],
-    }));
-    setIsFormModified(true);
-  };
-
-  const handleRemoveTask = (index) => {
-    const updatedTasks = [...playbook.tasks];
-    updatedTasks.splice(index, 1);
-    setPlaybook((prev) => ({ ...prev, tasks: updatedTasks }));
-    setIsFormModified(true);
-  };
-
-  const handleVariableChange = (index, field, value) => {
-    const updatedVariables = [...playbook.variables];
-    updatedVariables[index][field] = value;
-    setPlaybook((prev) => ({ ...prev, variables: updatedVariables }));
-    setIsFormModified(true);
-  };
-
-  const handleAddVariable = () => {
-    setPlaybook((prev) => ({
-      ...prev,
-      variables: [...prev.variables, { name: '', value: '' }],
-    }));
-    setIsFormModified(true);
-  };
-
-  const handleRemoveVariable = (index) => {
-    const updatedVariables = [...playbook.variables];
-    updatedVariables.splice(index, 1);
-    setPlaybook((prev) => ({ ...prev, variables: updatedVariables }));
-    setIsFormModified(true);
-  };
-
-  const handleGenerateYaml = () => {
-    const yamlContent = yaml.dump({
-      name: playbook.name,
-      description: playbook.description,
-      hosts: playbook.hosts,
-      tasks: playbook.tasks.map((task) => ({
-        name: task.name,
-        module: task.module,
-        args: task.args,
-      })),
-      vars: playbook.variables.reduce((acc, variable) => {
-        acc[variable.name] = variable.value;
-        return acc;
-      }, {}),
-    });
-    setContent(yamlContent);
-    setIsFormModified(false);
-  };
+    fetchPlaybook();
+  }, [name]);
 
   const handleSave = async () => {
     try {
-      await onSave(content);
-      toast.success('Playbook updated successfully!');
-      onClose();
+      await AnsibleService.updatePlaybook(name, yaml.dump(formFields));
+      navigate(`/playbook/${name}`);
     } catch (error) {
-      toast.error('Error updating playbook');
+      setError('Error updating playbook');
       console.error('Error updating playbook:', error);
     }
   };
 
+  const handleFieldChange = (e, key) => {
+    const value = e.target.value;
+    const keys = key.split('.');
+    setFormFields((prevFields) => {
+      const newFields = { ...prevFields };
+      let current = newFields;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) {
+          current[keys[i]] = {};
+        }
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      return newFields;
+    });
+  };
+
+  const renderFields = (fields, parentKey = '') => {
+    return Object.keys(fields).map((key) => {
+      const fieldKey = parentKey ? `${parentKey}.${key}` : key;
+      const value = fields[key];
+      if (value === null || value === undefined) {
+        return null;
+      }
+      if (Array.isArray(value)) {
+        return (
+          <Box key={fieldKey} sx={{ mt: 2 }}>
+            <Typography variant="h6">{key}</Typography>
+            {value.map((item, index) => renderFields(item, `${fieldKey}[${index}]`))}
+          </Box>
+        );
+      }
+      if (typeof value === 'object') {
+        return (
+          <Box key={fieldKey} sx={{ mt: 2 }}>
+            <Typography variant="h6">{key}</Typography>
+            {renderFields(value, fieldKey)}
+          </Box>
+        );
+      }
+      return (
+        <TextField
+          key={fieldKey}
+          label={key}
+          value={value}
+          onChange={(e) => handleFieldChange(e, fieldKey)}
+          fullWidth
+          margin="normal"
+        />
+      );
+    });
+  };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!playbook) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Paper sx={{ p: 3, maxWidth: 800, margin: 'auto', marginTop: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
-        <Typography variant="h6" gutterBottom>Modifier Playbook</Typography>
-        {!isFormModified ? (
-          <>
-            <TextField
-              label="Nom du Playbook"
-              fullWidth
-              margin="normal"
-              name="name"
-              value={playbook.name}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              label="Description"
-              fullWidth
-              margin="normal"
-              name="description"
-              value={playbook.description}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Hôtes"
-              fullWidth
-              margin="normal"
-              name="hosts"
-              value={playbook.hosts}
-              onChange={handleChange}
-              required
-            />
-            <Typography variant="h6" sx={{ mt: 2 }}>Tâches</Typography>
-            {playbook.tasks.map((task, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Nom de la Tâche"
-                      fullWidth
-                      value={task.name}
-                      onChange={(e) => handleTaskChange(index, 'name', e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Module Ansible"
-                      select
-                      fullWidth
-                      value={task.module}
-                      onChange={(e) => handleTaskChange(index, 'module', e.target.value)}
-                      required
-                    >
-                      <MenuItem value="ansible.builtin.package">ansible.builtin.package</MenuItem>
-                      <MenuItem value="ansible.builtin.service">ansible.builtin.service</MenuItem>
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <TextField
-                      label="Arguments"
-                      fullWidth
-                      value={task.args}
-                      onChange={(e) => handleTaskChange(index, 'args', e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={1}>
-                    <IconButton onClick={() => handleRemoveTask(index)}>
-                      <RemoveIcon />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </Box>
-            ))}
-            <Button startIcon={<AddIcon />} onClick={handleAddTask}>
-              Ajouter une Tâche
-            </Button>
-
-            <Typography variant="h6" sx={{ mt: 2 }}>Variables</Typography>
-            {playbook.variables.map((variable, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={5}>
-                    <TextField
-                      label="Nom de la Variable"
-                      fullWidth
-                      value={variable.name}
-                      onChange={(e) => handleVariableChange(index, 'name', e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={5}>
-                    <TextField
-                      label="Valeur de la Variable"
-                      fullWidth
-                      value={variable.value}
-                      onChange={(e) => handleVariableChange(index, 'value', e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={1}>
-                    <IconButton onClick={() => handleRemoveVariable(index)}>
-                      <RemoveIcon />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </Box>
-            ))}
-            <Button startIcon={<AddIcon />} onClick={handleAddVariable}>
-              Ajouter une Variable
-            </Button>
-
-            <Box sx={{ mt: 3 }}>
-              <Button variant="contained" color="primary" onClick={handleGenerateYaml} sx={{ mr: 2 }}>
-                Générer YAML
-              </Button>
-            </Box>
-          </>
-        ) : (
-          <>
-            <Typography variant="h6" sx={{ mt: 2 }}>Éditeur de Playbook YAML</Typography>
-            <Editor
-              height="400px"
-              defaultLanguage="yaml"
-              value={content}
-              onChange={(value) => setContent(value)}
-            />
-            <Box mt={2}>
-              <Button variant="contained" color="secondary" onClick={onClose} sx={{ ml: 2 }}>
-                Annuler
-              </Button>
-              <Button variant="contained" color="primary" onClick={handleSave} sx={{ ml: 2 }}>
-                Sauvegarder
-              </Button>
-            </Box>
-          </>
-        )}
-      </Paper>
-    </Modal>
+    <Paper sx={{ p: 3, borderRadius: '15px' }}>
+      <Typography variant="h4" gutterBottom>Edit Playbook: {name}</Typography>
+      {editType === 'fields' ? (
+        <Box component="form">
+          {renderFields(formFields)}
+        </Box>
+      ) : (
+        <TextField
+          label="Playbook Content"
+          value={newContent}
+          onChange={(e) => setNewContent(e.target.value)}
+          fullWidth
+          multiline
+          rows={20}
+          margin="normal"
+        />
+      )}
+      <Button onClick={handleSave}>Save</Button>
+    </Paper>
   );
 };
 
