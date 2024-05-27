@@ -1,25 +1,50 @@
-import React, { useState } from 'react';
-import { Modal, Paper, Typography, TextField, Grid, Box, Button, MenuItem, IconButton } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Modal, Paper, Typography, TextField, Grid, Box, Button, MenuItem, IconButton, Select, InputLabel, FormControl, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Editor from '@monaco-editor/react';
 import yaml from 'js-yaml';
+import AnsibleService from '../../services/ansibleService';
 
 const CreatePlaybook = ({ open, onClose, onSave }) => {
   const [newPlaybook, setNewPlaybook] = useState({
     name: '',
     description: '',
-    hosts: '',
+    hosts: [],
     tasks: [{ name: '', module: '', args: '' }],
     variables: [{ name: '', value: '' }]
   });
 
   const [playbookContent, setPlaybookContent] = useState('');
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [vms, setVms] = useState([]);
+
+  useEffect(() => {
+    const fetchVMs = async () => {
+      const vmsData = await AnsibleService.listVMs('proxmox-server');
+      setVms(vmsData);
+    };
+    fetchVMs();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPlaybook((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleHostChange = (event) => {
+    const { value } = event.target;
+    let selectedHosts = [...value];
+
+    // If 'all' is selected, clear other selections
+    if (selectedHosts.includes('all')) {
+      selectedHosts = ['all'];
+    } else {
+      // If 'all' is already selected and another host is selected, remove 'all'
+      selectedHosts = selectedHosts.filter(host => host !== 'all');
+    }
+
+    setNewPlaybook((prev) => ({ ...prev, hosts: selectedHosts }));
   };
 
   const handleTaskChange = (index, field, value) => {
@@ -64,7 +89,7 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
     const yamlContent = yaml.dump({
       name: newPlaybook.name,
       description: newPlaybook.description,
-      hosts: newPlaybook.hosts,
+      hosts: newPlaybook.hosts.join(':'),  // ajout de deux points entre vm
       tasks: newPlaybook.tasks.map((task) => ({
         name: task.name,
         module: task.module,
@@ -80,9 +105,14 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
   };
 
   const handleSave = () => {
-    onSave(newPlaybook.name, playbookContent);
+    let playbookName = newPlaybook.name;
+    if (!playbookName.endsWith('.yml')) {
+      playbookName += '.yml';
+    }
+    onSave(playbookName, playbookContent);
     setIsFormSubmitted(false);
   };
+  
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -107,15 +137,28 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
               value={newPlaybook.description}
               onChange={handleChange}
             />
-            <TextField
-              label="Hôtes"
-              fullWidth
-              margin="normal"
-              name="hosts"
-              value={newPlaybook.hosts}
-              onChange={handleChange}
-              required
-            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="hosts-label">Hôtes</InputLabel>
+              <Select
+                labelId="hosts-label"
+                id="hosts"
+                multiple
+                value={newPlaybook.hosts}
+                onChange={handleHostChange}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                <MenuItem value="all">all</MenuItem>
+                {vms.map((vm) => (
+                  <MenuItem key={vm.vmid} value={vm.name}>{vm.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Typography variant="h6" sx={{ mt: 2 }}>Tâches</Typography>
             {newPlaybook.tasks.map((task, index) => (
               <Box key={index} sx={{ mb: 2 }}>

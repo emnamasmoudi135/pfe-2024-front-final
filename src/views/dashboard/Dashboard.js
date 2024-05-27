@@ -16,29 +16,29 @@ const Dashboard = () => {
     }
   };
 
-  const handleansible = async () => {
-      navigate('/ansible');   
+  const handleAnsible = async () => {
+    navigate('/ansible');
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-      <div className="d-flex justify-content-center flex-wrap">
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh'}}>
+      <div className="d-flex justify-content-center flex-wrap" style={{ gap: '20px' }}>
         <CustomCard
-          icon={<FaTools />}
+          icon={<FaTools style={{ fontSize: '2rem', color: '#3664AD' }} />}
           title="Ansible"
           description="Automate your IT tasks"
           buttonText="Automate"
-          onClick={handleansible}
+          onClick={handleAnsible}
         />
         <CustomCard
-          icon={<FaNetworkWired />}
+          icon={<FaNetworkWired style={{ fontSize: '2rem', color: '#3664AD' }} />}
           title="Proxmox"
-          description="Connect to proxmox dashboard"
+          description="Connect to Proxmox dashboard"
           buttonText="Connect"
           onClick={handleProxmoxConnect} // Appel de la fonction de login et redirection
         />
         <CustomCard
-          icon={<FaServer />}
+          icon={<FaServer style={{ fontSize: '2rem', color: '#3664AD' }} />}
           title="Terraform"
           description="Infrastructure as Code"
           buttonText="Deploy"
