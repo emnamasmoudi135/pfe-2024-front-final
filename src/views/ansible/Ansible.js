@@ -3,16 +3,18 @@ import { Container, Button, Grid, Paper, Typography, Box, Table, TableBody, Tabl
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreatePlaybook from './CreatePlaybook';
+import ExecutePlaybook from './ExecutePlaybook';
 import AnsibleService from '../../services/ansibleService';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useNavigate } from 'react-router-dom';
 
 const Ansible = () => {
   const [playbooks, setPlaybooks] = useState([]);
   const [filteredPlaybooks, setFilteredPlaybooks] = useState([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [playbookContent, setPlaybookContent] = useState('');
+  const [executeModalOpen, setExecuteModalOpen] = useState(false);
   const [selectedPlaybook, setSelectedPlaybook] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -34,11 +36,15 @@ const Ansible = () => {
     navigate(`/playbook/${playbook}`);
     const content = await AnsibleService.getPlaybookDetail(playbook);
     setSelectedPlaybook(playbook);
-    setPlaybookContent(content);
   };
 
   const handleEditPlaybook = (playbook) => {
     navigate(`/edit-playbook/${playbook}`);
+  };
+
+  const handleExecutePlaybook = (playbook) => {
+    setSelectedPlaybook(playbook);
+    setExecuteModalOpen(true);
   };
 
   const handleSavePlaybook = async (name, content) => {
@@ -96,7 +102,7 @@ const Ansible = () => {
       <ToastContainer />
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
         <TextField
-          label="Rechercher un playbook"
+          label="Search playbook"
           variant="outlined"
           value={searchTerm}
           onChange={handleSearch}
@@ -107,17 +113,17 @@ const Ansible = () => {
           sx={{ backgroundColor: '#3664AD', color: 'white', '&:hover': { backgroundColor: '#3664AD' } }} 
           onClick={() => setCreateModalOpen(true)}
         >
-          Créer Playbook
+          Create Playbook
         </Button>
       </Box>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Paper sx={{ p: 3, borderRadius: '15px', backgroundColor: '#d95ca9', color: 'white', mb: 2 }}>
+          <Paper sx={{ p: 3, borderRadius: '15px 15px 0 0', backgroundColor: '#d95ca9', color: 'white' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h4" gutterBottom>Playbooks</Typography>
             </Box>
           </Paper>
-          <Paper sx={{ p: 0, borderRadius: '15px' }}>
+          <Paper sx={{ p: 0, borderRadius: '0 0 15px 15px' }}>
             <TableContainer>
               <Table>
                 <TableBody>
@@ -130,9 +136,12 @@ const Ansible = () => {
                     >
                       <TableCell>{playbook}</TableCell>
                       <TableCell align="right">
-                        <IconButton onClick={() => handleEditPlaybook(playbook)} sx={{ color: '#3664AD' }}>
-                          <EditIcon />
+                        <IconButton onClick={(event) => { event.stopPropagation(); handleExecutePlaybook(playbook); }} sx={{ color: '#3664AD' }}>
+                          <PlayArrowIcon />
                         </IconButton>
+                        <IconButton onClick={() => handleEditPlaybook(playbook)} sx={{ color: '#3664AD' }}>
+                        <EditIcon />
+                      </IconButton>
                         <IconButton onClick={(event) => { event.stopPropagation(); openDeleteDialog(playbook); }} sx={{ color: '#3664AD' }}>
                           <DeleteIcon />
                         </IconButton>
@@ -146,6 +155,7 @@ const Ansible = () => {
         </Grid>
       </Grid>
       <CreatePlaybook open={createModalOpen} onClose={() => setCreateModalOpen(false)} onSave={handleSavePlaybook} />
+      <ExecutePlaybook playbookName={selectedPlaybook} open={executeModalOpen} onClose={() => setExecuteModalOpen(false)} />
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>

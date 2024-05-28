@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Paper, Typography, TextField, Grid, Box, Button, MenuItem, IconButton, Select, InputLabel, FormControl, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Editor from '@monaco-editor/react';
 import yaml from 'js-yaml';
 import AnsibleService from '../../services/ansibleService';
@@ -121,9 +123,19 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
     setIsFormSubmitted(false);
   };
 
+  const handleBackToForm = () => {
+    setIsFormSubmitted(false);
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
-      <Paper sx={{ p: 3, maxWidth: 800, margin: 'auto', marginTop: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
+      <Paper sx={{ p: 3, maxWidth: 800, margin: 'auto', marginTop: '5%', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
+        <IconButton
+          onClick={onClose}
+          sx={{ position: 'absolute', top: 8, right: 8, color: '#3664AD' }}
+        >
+          <CloseIcon />
+        </IconButton>
         <Typography variant="h6" gutterBottom>Créer Nouveau Playbook</Typography>
         {!isFormSubmitted ? (
           <>
@@ -195,14 +207,14 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
                     />
                   </Grid>
                   <Grid item xs={1}>
-                    <IconButton onClick={() => handleRemoveTask(index)}>
+                    <IconButton onClick={() => handleRemoveTask(index)} sx={{ color: '#3664AD' }}>
                       <RemoveIcon />
                     </IconButton>
                   </Grid>
                 </Grid>
               </Box>
             ))}
-            <Button startIcon={<AddIcon />} onClick={handleAddTask}>
+            <Button startIcon={<AddIcon />} onClick={handleAddTask} sx={{ color: '#3664AD' }}>
               Ajouter une Tâche
             </Button>
 
@@ -229,25 +241,32 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
                     />
                   </Grid>
                   <Grid item xs={1}>
-                    <IconButton onClick={() => handleRemoveVariable(index)}>
+                    <IconButton onClick={() => handleRemoveVariable(index)} sx={{ color: '#3664AD' }}>
                       <RemoveIcon />
                     </IconButton>
                   </Grid>
                 </Grid>
               </Box>
             ))}
-            <Button startIcon={<AddIcon />} onClick={handleAddVariable}>
+            <Button startIcon={<AddIcon />} onClick={handleAddVariable} sx={{ color: '#3664AD' }}>
               Ajouter une Variable
             </Button>
 
             <Box sx={{ mt: 3 }}>
-              <Button variant="contained" color="primary" onClick={handleGenerateYaml} sx={{ mr: 2 }}>
+              <Button variant="contained" onClick={handleGenerateYaml} sx={{ mr: 2, backgroundColor: '#3664AD', color: '#fff' }}>
                 Générer YAML
               </Button>
             </Box>
           </>
         ) : (
           <>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={handleBackToForm}
+              sx={{ mb: 2, color: '#3664AD' }}
+            >
+            Back to Form
+            </Button>
             <Typography variant="h6" sx={{ mt: 2 }}>Éditeur de Playbook YAML</Typography>
             <Editor
               height="400px"
@@ -255,11 +274,10 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
               value={playbookContent}
               onChange={(value) => setPlaybookContent(value)}
             />
-            <Box sx={{ mt: 3 }}>
-              <Button variant="contained" color="primary" onClick={handleSave}>
+              <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#3664AD', color: '#fff' }}>
                 Créer Playbook
               </Button>
-            </Box>
+            
           </>
         )}
       </Paper>

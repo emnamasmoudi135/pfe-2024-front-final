@@ -80,6 +80,17 @@ class AnsibleService {
       return [];
     }
   }
+
+  async executePlaybook(playbookName) {
+    try {
+      const response = await axios.post(`${BASE_URL}/execute-playbook/${playbookName}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error executing playbook ${playbookName}:`, error);
+      throw error;
+    }
+  }
+
 }
 
 export default new AnsibleService();
