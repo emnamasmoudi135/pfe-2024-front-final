@@ -9,10 +9,9 @@ import AnsibleService from '../../services/ansibleService';
 const CreatePlaybook = ({ open, onClose, onSave }) => {
   const [newPlaybook, setNewPlaybook] = useState({
     name: '',
-    description: '',
     hosts: [],
     tasks: [{ name: '', module: '', args: '' }],
-    variables: [{ name: '', value: '' }]
+    variables: [{ name: 'ansible_ssh_common_args', value: '-o StrictHostKeyChecking=no' }]
   });
 
   const [playbookContent, setPlaybookContent] = useState('');
@@ -36,11 +35,9 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
     const { value } = event.target;
     let selectedHosts = [...value];
 
-    // If 'all' is selected, clear other selections
     if (selectedHosts.includes('all')) {
       selectedHosts = ['all'];
     } else {
-      // If 'all' is already selected and another host is selected, remove 'all'
       selectedHosts = selectedHosts.filter(host => host !== 'all');
     }
 
@@ -86,20 +83,31 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
   };
 
   const handleGenerateYaml = () => {
-    const yamlContent = yaml.dump({
-      name: newPlaybook.name,
-      description: newPlaybook.description,
-      hosts: newPlaybook.hosts.join(':'),  // ajout de deux points entre vm
-      tasks: newPlaybook.tasks.map((task) => ({
-        name: task.name,
-        module: task.module,
-        args: task.args,
-      })),
-      vars: newPlaybook.variables.reduce((acc, variable) => {
-        acc[variable.name] = variable.value;
-        return acc;
-      }, {}),
-    });
+    const yamlContent = yaml.dump([
+      {
+        name: newPlaybook.name,
+        hosts: newPlaybook.hosts.join(':'),
+        gather_facts: false,
+        tasks: newPlaybook.tasks.map((task) => {
+          const taskObject = {
+            name: task.name,
+          };
+          if (task.module === 'ansible.builtin.command' || task.module === 'ansible.builtin.shell') {
+            taskObject[task.module] = { cmd: task.args };
+          } else {
+            taskObject[task.module] = { msg: task.args };
+          }
+          return taskObject;
+        }),
+        vars: {
+          ...newPlaybook.variables.reduce((acc, variable) => {
+            acc[variable.name] = variable.value;
+            return acc;
+          }, {}),
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no' // Ajout de la variable par défaut
+        }
+      }
+    ]);
     setPlaybookContent(yamlContent);
     setIsFormSubmitted(true);
   };
@@ -112,7 +120,6 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
     onSave(playbookName, playbookContent);
     setIsFormSubmitted(false);
   };
-  
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -128,14 +135,6 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
               value={newPlaybook.name}
               onChange={handleChange}
               required
-            />
-            <TextField
-              label="Description"
-              fullWidth
-              margin="normal"
-              name="description"
-              value={newPlaybook.description}
-              onChange={handleChange}
             />
             <FormControl fullWidth margin="normal">
               <InputLabel id="hosts-label">Hôtes</InputLabel>
@@ -181,8 +180,9 @@ const CreatePlaybook = ({ open, onClose, onSave }) => {
                       onChange={(e) => handleTaskChange(index, 'module', e.target.value)}
                       required
                     >
-                      <MenuItem value="ansible.builtin.package">ansible.builtin.package</MenuItem>
-                      <MenuItem value="ansible.builtin.service">ansible.builtin.service</MenuItem>
+                      <MenuItem value="ansible.builtin.debug">ansible.builtin.debug</MenuItem>
+                      <MenuItem value="ansible.builtin.command">ansible.builtin.command</MenuItem>
+                      <MenuItem value="ansible.builtin.shell">ansible.builtin.shell</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item xs={3}>
