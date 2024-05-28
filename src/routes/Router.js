@@ -19,6 +19,8 @@ const Proxmox = Loadable(lazy(() => import('../views/Proxmox/Proxmox')));
 const Ansible = Loadable(lazy(() => import('../views/ansible/Ansible')));
 const PlaybookDetail = Loadable(lazy(() => import('../views/ansible/PlaybookDetail')));
 const EditPlaybook = Loadable(lazy(() => import('../views/ansible/EditPlaybook')));
+const Reglages = Loadable(lazy(() => import('../views/reglages/Reglages')));
+const Terraform = Loadable(lazy(() => import('../views/terraform/terraform')));
 
 
 
@@ -34,6 +36,9 @@ const Router = [
       { path: '/ansible', exact: true, element: <Ansible /> },
       { path: "/playbook/:name", exact: true, element: <PlaybookDetail /> },
       { path: "/edit-playbook/:editType/:name", exact: true, element: <EditPlaybook /> },
+      { path: "/settings", exact: true, element: <Reglages /> },
+      { path: "/terraform", exact: true, element: <Terraform /> },
+
       { path: '/icons', exact: true, element: <Icons /> },
       { path: '/ui/typography', exact: true, element: <TypographyPage /> },
       { path: '/ui/shadow', exact: true, element: <Shadow /> },

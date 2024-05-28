@@ -91,6 +91,46 @@ class AnsibleService {
     }
   }
 
+  async modifyEnv(newContent) {
+    try {
+      const response = await axios.post(`${BASE_URL}/env`, newContent);
+      return response.data;
+    } catch (error) {
+      console.error('Error modifying .env file:', error);
+      throw error;
+    }
+  }
+
+  async modifyHosts(newContent) {
+    try {
+      const response = await axios.post(`${BASE_URL}/modify-hosts`, { new_content: newContent });
+      return response.data;
+    } catch (error) {
+      console.error('Error modifying hosts file:', error);
+      throw error;
+    }
+  }
+  
+  async getEnv() {
+    try {
+      const response = await axios.get(`${BASE_URL}/env`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching environment variables:', error);
+      throw error;
+    }
+  }
+
+  async getHostsContent() {
+    try {
+      const response = await axios.get(`${BASE_URL}/get-hosts-content`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching hosts content:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default new AnsibleService();

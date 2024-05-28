@@ -22,37 +22,19 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Typography',
-    icon: IconTypography,
-    href: '/ui/typography',
-  },
-  {
-    id: uniqueId(),
     title: 'proxmox dashboard',
     icon: IconTypography,
     href: '/proxmox',
   },
   {
-    id: uniqueId(),
-    title: 'Shadow',
-    icon: IconCopy,
-    href: '/ui/shadow',
-  },
-  {
     navlabel: true,
-    subheader: 'Auth',
+    subheader: 'Settings',
   },
   {
     id: uniqueId(),
-    title: 'Login',
-    icon: IconLogin,
-    href: '/auth/login',
-  },
-  {
-    id: uniqueId(),
-    title: 'Register',
-    icon: IconUserPlus,
-    href: '/auth/register',
+    title: 'ENVIRONMENT ',
+    icon: IconAperture,
+    href: '/settings',
   },
   {
     navlabel: true,
@@ -60,15 +42,19 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Icons',
-    icon: IconMoodHappy,
-    href: '/icons',
-  },
-  {
-    id: uniqueId(),
     title: 'Ansible Managment',
     icon: IconAperture,
     href: '/ansible',
+  },
+  {
+    navlabel: true,
+    subheader: 'Terraform',
+  },
+  {
+    id: uniqueId(),
+    title: 'Terraform Managment',
+    icon: IconAperture,
+    href: '/terraform',
   },
 ];
 

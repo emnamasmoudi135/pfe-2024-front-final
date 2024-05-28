@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AnsibleService from 'src/services/ansibleService';
-import { Paper, Typography, Box, Button } from '@mui/material';
+import { Paper, Typography, Box, Button, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import yaml from 'js-yaml';
 
 const PlaybookDetail = () => {
@@ -38,6 +39,10 @@ const PlaybookDetail = () => {
     navigate(`/edit-playbook/yaml/${name}`);
   };
 
+  const handleBack = () => {
+    navigate('/ansible');
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -47,14 +52,19 @@ const PlaybookDetail = () => {
   }
 
   return (
-    <Paper sx={{ p: 3, borderRadius: '15px' }}>
-      <Typography variant="h4" gutterBottom>Playbook: {name}</Typography>
-      <Box>
-        <pre>{yaml.dump(playbook)}</pre>
-      </Box>
-      <Button onClick={handleEditWithField}>Edit with Field</Button>
-      <Button onClick={handleEditWithYaml}>Edit with YAML</Button>
-    </Paper>
+    <Box>
+      <IconButton onClick={handleBack} sx={{ color: '#3664AD', mb: 2 }}>
+        <ArrowBackIcon />
+      </IconButton>
+      <Paper sx={{ p: 3, borderRadius: '15px' }}>
+        <Typography variant="h4" gutterBottom>Playbook: {name}</Typography>
+        <Box>
+          <pre>{yaml.dump(playbook)}</pre>
+        </Box>
+        <Button onClick={handleEditWithField}>Edit with Field</Button>
+        <Button onClick={handleEditWithYaml}>Edit with YAML</Button>
+      </Paper>
+    </Box>
   );
 };
 
