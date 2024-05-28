@@ -36,7 +36,15 @@ const EditPlaybook = () => {
 
   const handleSave = async () => {
     try {
-      await AnsibleService.updatePlaybook(name, yaml.dump(formFields));
+      let updatedContent;
+      if (editType === 'fields') {
+        updatedContent = yaml.dump(formFields);
+      } else {
+        updatedContent = newContent;
+        // Parse YAML content to ensure it's valid and update formFields for consistency
+        setFormFields(yaml.load(newContent));
+      }
+      await AnsibleService.updatePlaybook(name, updatedContent);
       navigate(`/playbook/${name}`);
     } catch (error) {
       setError('Error updating playbook');
