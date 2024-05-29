@@ -19,6 +19,9 @@ const Dashboard = () => {
   const handleAnsible = async () => {
     navigate('/ansible');
   };
+  const handleTerraform = async () => {
+    navigate('/terraform');
+  };
 
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh'}}>
@@ -42,7 +45,7 @@ const Dashboard = () => {
           title="Terraform"
           description="Infrastructure as Code"
           buttonText="Deploy"
-          onClick={() => alert('Terraform Deploy')}
+          onClick={handleTerraform}
         />
       </div>
     </div>

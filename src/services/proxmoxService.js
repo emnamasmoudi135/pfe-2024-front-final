@@ -64,7 +64,7 @@ const getVMStatus = async (node, vmid) => {
 
 const startVM = async (node, vmid) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/nodes/${node}/qemu/${vmid}/status/start`);
+        const response = await axios.post(`${API_BASE_URL}/vms/${node}/${vmid}/start`);
         return response.data;
     } catch (error) {
         console.error('Starting VM failed:', error);
@@ -74,7 +74,7 @@ const startVM = async (node, vmid) => {
 
 const stopVM = async (node, vmid) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/nodes/${node}/qemu/${vmid}/status/stop`);
+        const response = await axios.post(`${API_BASE_URL}/vms/${node}/${vmid}/stop`);
         return response.data;
     } catch (error) {
         console.error('Stopping VM failed:', error);

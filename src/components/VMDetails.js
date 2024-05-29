@@ -118,6 +118,7 @@ const VMDetails = ({ selectedVM, refreshVMs, onBack }) => {
       toast.error('VM name does not match');
     }
   };
+  
 
   return (
     <Container>
