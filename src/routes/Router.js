@@ -14,13 +14,16 @@ const TypographyPage = Loadable(lazy(() => import('../views/utilities/Typography
 const Shadow = Loadable(lazy(() => import('../views/utilities/Shadow')))
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Register = Loadable(lazy(() => import('../views/authentication/Register')));
-const Login = Loadable(lazy(() => import('../views/authentication/Login')));
+// const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const Proxmox = Loadable(lazy(() => import('../views/Proxmox/Proxmox')));
 const Ansible = Loadable(lazy(() => import('../views/ansible/Ansible')));
 const PlaybookDetail = Loadable(lazy(() => import('../views/ansible/PlaybookDetail')));
 const EditPlaybook = Loadable(lazy(() => import('../views/ansible/EditPlaybook')));
 const Reglages = Loadable(lazy(() => import('../views/reglages/Reglages')));
 const Terraform = Loadable(lazy(() => import('../views/terraform/terraform')));
+const Signup = Loadable(lazy(() => import('../views/auth/Signup')));
+const Login = Loadable(lazy(() => import('../views/auth/Login')));
+const Logout = Loadable(lazy(() => import('../views/auth/Logout')));
 
 
 
@@ -31,14 +34,17 @@ const Router = [
     children: [
       { path: '/', element: <Navigate to="/dashboard" /> },
       { path: '/dashboard', exact: true, element: <Dashboard /> },
-      { path: '/sample-page', exact: true, element: <SamplePage /> },
       { path: '/proxmox', exact: true, element: <Proxmox /> },
       { path: '/ansible', exact: true, element: <Ansible /> },
       { path: "/playbook/:name", exact: true, element: <PlaybookDetail /> },
       { path: "/edit-playbook/:editType/:name", exact: true, element: <EditPlaybook /> },
-      { path: "/settings", exact: true, element: <Reglages /> },
       { path: "/terraform", exact: true, element: <Terraform /> },
+      { path: "/settings", exact: true, element: <Reglages /> },
 
+
+
+      { path: "/auth/register", exact: true, element: <Register /> },
+      { path: '/sample-page', exact: true, element: <SamplePage /> },
       { path: '/icons', exact: true, element: <Icons /> },
       { path: '/ui/typography', exact: true, element: <TypographyPage /> },
       { path: '/ui/shadow', exact: true, element: <Shadow /> },
@@ -50,11 +56,16 @@ const Router = [
     element: <BlankLayout />,
     children: [
       { path: '404', element: <Error /> },
-      { path: '/auth/register', element: <Register /> },
+      { path: '/auth/signup', element: <Signup /> },
       { path: '/auth/login', element: <Login /> },
+      { path: '/auth/logout', element: <Logout /> },
+
+      
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
 ];
 
 export default Router;
+
+

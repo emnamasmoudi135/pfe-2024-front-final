@@ -93,7 +93,7 @@ class AnsibleService {
 
   async modifyEnv(newContent) {
     try {
-      const response = await axios.post(`${BASE_URL}/env`, newContent);
+      const response = await axios.put(`${BASE_URL}/env`, newContent);
       return response.data;
     } catch (error) {
       console.error('Error modifying .env file:', error);
