@@ -1,6 +1,7 @@
 import axios from 'axios';
-
-const BASE_URL = 'http://127.0.0.1:5000';
+// 192.168.1.14
+// const BASE_URL = 'http://10.20.0.65:5000';  
+const BASE_URL = 'http://127.0.0.1:5000';  
 const PROXMOX_BASE_URL = BASE_URL;
 
 class AnsibleService {

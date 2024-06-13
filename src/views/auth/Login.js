@@ -2,13 +2,37 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box, Card } from '@mui/material';
 import { login } from '../../services/authService';
-import { useNavigate } from 'react-router-dom';
-import Logo from 'src/layouts/full/shared/logo/Logo';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Logo from '../../layouts/full/shared/logo/Logo';
+import {jwtDecode} from 'jwt-decode';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');
+        if (token) {
+            try {
+                if (token.split('.').length === 3) {
+                    localStorage.setItem('token', token);
+                    const user = jwtDecode(token);
+                    localStorage.setItem('role', user.role);
+                    navigate('/dashboard');
+                } else {
+                    throw new Error('Invalid token format');
+                }
+            } catch (err) {
+                console.error('Login confirmation failed:', err);
+                setError('Login confirmation failed. Please try again.');
+            }
+        }
+    }, [location, navigate]);
 
     useEffect(() => {
         document.body.style.backgroundColor = '#DFE8F6';
@@ -19,23 +43,21 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+        setMessage('');
         try {
             const response = await login(email, password);
-            alert(response.message);
-            if (response.token) {
-                // Save token in localStorage or state management
-                localStorage.setItem('token', response.token);
-                navigate('/dashboard');
+            if (response.message) {
+                setMessage(response.message);
             }
         } catch (error) {
             if (error.response && error.response.data) {
-                alert(error.response.data.error);
+                setError(error.response.data.error);
             } else {
-                alert('Login failed. Please try again.');
+                setError('Login failed. Please try again.');
             }
         }
     };
-    
 
     return (
         <Container maxWidth="xs" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -61,6 +83,8 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {error && <Typography color="error" variant="body2">{error}</Typography>}
+                        {message && <Typography color="primary" variant="body2">{message}</Typography>}
                         <Button
                             fullWidth
                             variant="contained"

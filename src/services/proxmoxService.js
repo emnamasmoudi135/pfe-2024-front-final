@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+// const API_BASE_URL = 'http://192.168.1.14:5000';
+// const API_BASE_URL = 'http://10.20.0.65:5000';
+const API_BASE_URL = 'http://127.0.0.1:5000';  
 
 const loginProxmox = async () => {
     try {

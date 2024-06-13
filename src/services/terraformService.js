@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:5000/terraform';
-
+// const BASE_URL = 'http://192.168.1.14:5000/terraform';
+// const BASE_URL = 'http://10.20.0.65:5000/terraform';
+const BASE_URL = 'http://127.0.0.1:5000/terraform';  
 const terraformService = {
   getConfig: async () => {
     const response = await axios.get(`${BASE_URL}/config`);

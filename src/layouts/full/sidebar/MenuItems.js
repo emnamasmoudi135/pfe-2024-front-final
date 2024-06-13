@@ -27,8 +27,20 @@ const Menuitems = [
     href: '/proxmox',
   },
   {
+    id: uniqueId(),
+    title: 'prometheus dashboard',
+    icon: IconTypography,
+    href: '/prometheus',
+  },
+  {
     navlabel: true,
     subheader: 'Settings',
+  },
+  {
+    id: uniqueId(),
+    title: 'User Managment ',
+    icon: IconAperture,
+    href: '/userTable',
   },
   {
     id: uniqueId(),

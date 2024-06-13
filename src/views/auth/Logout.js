@@ -1,5 +1,5 @@
-// src/views/Logout.js
-import React, { useEffect } from 'react';
+// src/views/auth/Logout.js
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/authService';
 
@@ -7,18 +7,11 @@ const Logout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const performLogout = async () => {
-            await logout();
-            navigate('/login');
-        };
-        performLogout();
+        logout();
+        navigate('/auth/login');
     }, [navigate]);
 
-    return (
-        <div>
-            <h2>Logging out...</h2>
-        </div>
-    );
+    return null;
 };
 
 export default Logout;

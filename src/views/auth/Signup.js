@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box, Card } from '@mui/material';
 import { signup } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
-import Logo from 'src/layouts/full/shared/logo/Logo';
+import Logo from '../../layouts/full/shared/logo/Logo';
 
 const Signup = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,12 +22,23 @@ const Signup = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setError('');
+        setMessage('');
         try {
             const response = await signup(username, email, password);
-            alert(response.message);
-            navigate('/auth/login');
+            setMessage(response.message);
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setTimeout(() => {
+                navigate('/auth/login');
+            }, 2000);
         } catch (error) {
-            alert(error.response.data.error);
+            if (error.response && error.response.data) {
+                setError(error.response.data.error);
+            } else {
+                setError('Signup failed. Please try again.');
+            }
         }
     };
 
@@ -60,6 +73,8 @@ const Signup = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {error && <Typography color="error" variant="body2">{error}</Typography>}
+                        {message && <Typography color="primary" variant="body2">{message}</Typography>}
                         <Button
                             fullWidth
                             variant="contained"
