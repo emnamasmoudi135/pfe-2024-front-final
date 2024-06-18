@@ -7,8 +7,19 @@ const Logout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        logout();
-        navigate('/auth/login');
+        const performLogout = async () => {
+            try {
+                await logout();
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                navigate('/auth/login');
+            } catch (error) {
+                console.error('Error logging out:', error);
+                navigate('/auth/login');
+            }
+        };
+
+        performLogout();
     }, [navigate]);
 
     return null;

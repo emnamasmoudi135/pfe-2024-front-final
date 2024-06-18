@@ -13,8 +13,13 @@ export const signup = async (username, email, password) => {
     return response.data;
 };
 
-export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
+export const logout = async () => {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`${API_URL}/logout`, {}, {
+        withCredentials: true,
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
 };
-

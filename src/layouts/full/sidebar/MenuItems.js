@@ -1,20 +1,19 @@
 import {
-  IconAperture, IconCopy, IconLayoutDashboard, IconLogin, IconMoodHappy, IconTypography, IconUserPlus
+  IconAperture, IconCopy, IconLayoutDashboard, IconTypography, IconUserPlus
 } from '@tabler/icons';
-
 import { uniqueId } from 'lodash';
 
-const Menuitems = [
+const allMenuItems = [
   {
     navlabel: true,
     subheader: 'Home',
   },
-
   {
     id: uniqueId(),
     title: 'Dashboard',
     icon: IconLayoutDashboard,
     href: '/dashboard',
+    roles: ['user', 'admin'],
   },
   {
     navlabel: true,
@@ -22,15 +21,17 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'proxmox dashboard',
+    title: 'Proxmox Dashboard',
     icon: IconTypography,
     href: '/proxmox',
+    roles: ['user', 'admin'],
   },
   {
     id: uniqueId(),
-    title: 'prometheus dashboard',
+    title: 'Prometheus Dashboard',
     icon: IconTypography,
     href: '/prometheus',
+    roles: ['user', 'admin'],
   },
   {
     navlabel: true,
@@ -38,15 +39,17 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'User Managment ',
+    title: 'User Management',
     icon: IconAperture,
     href: '/userTable',
+    roles: ['admin'],
   },
   {
     id: uniqueId(),
-    title: 'ENVIRONMENT ',
+    title: 'Environment',
     icon: IconAperture,
     href: '/settings',
+    roles: ['admin'],
   },
   {
     navlabel: true,
@@ -54,9 +57,10 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Ansible Managment',
+    title: 'Ansible Management',
     icon: IconAperture,
     href: '/ansible',
+    roles: ['user', 'admin'],
   },
   {
     navlabel: true,
@@ -64,10 +68,15 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Terraform Managment',
+    title: 'Terraform Management',
     icon: IconAperture,
     href: '/terraform',
+    roles: ['user', 'admin'],
   },
 ];
 
-export default Menuitems;
+export const getMenuItems = (role) => {
+  return allMenuItems.filter(item => !item.roles || item.roles.includes(role));
+};
+
+export default allMenuItems;
