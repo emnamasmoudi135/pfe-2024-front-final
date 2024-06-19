@@ -97,6 +97,9 @@ const Login = () => {
                     <Typography variant="body2" align="center" style={{ marginTop: '10px' }}>
                         Don't have an account? <span style={{ color: '#3664AD', cursor: 'pointer' }} onClick={() => navigate('/auth/signup')}>Sign Up</span>
                     </Typography>
+                    <Typography variant="body2" align="center" style={{ marginTop: '10px' }}>
+                    Forgot your password? <span style={{ color: '#3664AD', cursor: 'pointer' }} onClick={() => navigate('/auth/forgot-password')}>Reset Password</span>
+                </Typography>
                 </Box>
             </Card>
         </Container>

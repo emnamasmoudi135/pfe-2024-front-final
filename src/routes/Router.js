@@ -26,6 +26,8 @@ const Login = Loadable(lazy(() => import('../views/auth/Login')));
 const Logout = Loadable(lazy(() => import('../views/auth/Logout')));
 const Prometheus = Loadable(lazy(() => import('../views/prometheus/dashboardProxmox')));
 const UserTable = Loadable(lazy(() => import('../views/auth/UserTable')));
+const ForgotPassword = Loadable(lazy(() => import('../views/auth/ForgotPassword')));
+const ResetPassword = Loadable(lazy(() => import('../views/auth/ResetPassword')));
 
 const Router = [
   {
@@ -58,6 +60,8 @@ const Router = [
       { path: '/auth/signup', element: <Signup /> },
       { path: '/auth/login', element: <Login /> },
       { path: '/auth/logout', element: <Logout /> },
+      { path: '/auth/forgot-password', element: <ForgotPassword /> },
+      { path: '/auth/reset-password', element: <ResetPassword /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
