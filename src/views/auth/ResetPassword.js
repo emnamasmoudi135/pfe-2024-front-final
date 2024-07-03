@@ -4,6 +4,9 @@ import { TextField, Button, Typography, Container, Box, Card } from '@mui/materi
 import { useNavigate, useLocation } from 'react-router-dom';
 import { resetPassword } from '../../services/authService';
 
+
+
+
 const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,6 +17,14 @@ const ResetPassword = () => {
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get('token');
 
+    useEffect(() => {
+        document.body.style.backgroundColor = '#DFE8F6';
+        return () => {
+            document.body.style.backgroundColor = null; // Reset background color on cleanup
+        };
+    }, []);
+
+    
     const handleResetPassword = async (e) => {
         e.preventDefault();
         setError('');

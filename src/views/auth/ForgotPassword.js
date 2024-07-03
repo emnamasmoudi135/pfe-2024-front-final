@@ -1,5 +1,5 @@
 // src/views/auth/ForgotPassword.js
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box, Card } from '@mui/material';
 import { forgotPassword } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,14 @@ const ForgotPassword = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+        document.body.style.backgroundColor = '#DFE8F6';
+        return () => {
+            document.body.style.backgroundColor = null; // Reset background color on cleanup
+        };
+    }, []);
+    
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setError('');

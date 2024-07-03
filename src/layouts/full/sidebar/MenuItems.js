@@ -1,9 +1,12 @@
 import {
-  IconAperture, IconCopy, IconLayoutDashboard, IconTypography, IconUserPlus
+  IconAperture, IconTypography, IconLayoutDashboard,
 } from '@tabler/icons';
 import { uniqueId } from 'lodash';
+import getUserRole from './getUserRole'; // Assurez-vous de corriger le chemin d'importation
 
-const allMenuItems = [
+const userRole = getUserRole();
+
+const Menuitems = [
   {
     navlabel: true,
     subheader: 'Home',
@@ -13,7 +16,6 @@ const allMenuItems = [
     title: 'Dashboard',
     icon: IconLayoutDashboard,
     href: '/dashboard',
-    roles: ['user', 'admin'],
   },
   {
     navlabel: true,
@@ -24,33 +26,32 @@ const allMenuItems = [
     title: 'Proxmox Dashboard',
     icon: IconTypography,
     href: '/proxmox',
-    roles: ['user', 'admin'],
   },
   {
     id: uniqueId(),
     title: 'Prometheus Dashboard',
     icon: IconTypography,
     href: '/prometheus',
-    roles: ['user', 'admin'],
   },
-  {
-    navlabel: true,
-    subheader: 'Settings',
-  },
-  {
-    id: uniqueId(),
-    title: 'User Management',
-    icon: IconAperture,
-    href: '/userTable',
-    roles: ['admin'],
-  },
-  {
-    id: uniqueId(),
-    title: 'Environment',
-    icon: IconAperture,
-    href: '/settings',
-    roles: ['admin'],
-  },
+  // Ajoutez les éléments suivants conditionnellement
+  ...(userRole === 'admin' ? [
+    {
+      navlabel: true,
+      subheader: 'Settings',
+    },
+    {
+      id: uniqueId(),
+      title: 'User Management',
+      icon: IconAperture,
+      href: '/userTable',
+    },
+    {
+      id: uniqueId(),
+      title: 'ENVIRONMENT',
+      icon: IconAperture,
+      href: '/settings',
+    },
+  ] : []),
   {
     navlabel: true,
     subheader: 'Ansible',
@@ -60,23 +61,18 @@ const allMenuItems = [
     title: 'Ansible Management',
     icon: IconAperture,
     href: '/ansible',
-    roles: ['user', 'admin'],
   },
-  {
-    navlabel: true,
-    subheader: 'Terraform',
-  },
-  {
-    id: uniqueId(),
-    title: 'Terraform Management',
-    icon: IconAperture,
-    href: '/terraform',
-    roles: ['user', 'admin'],
-  },
+    {
+      navlabel: true,
+      subheader: 'Terraform',
+    },
+    {
+      id: uniqueId(),
+      title: 'Terraform Management',
+      icon: IconAperture,
+      href: '/terraform',
+    },
+  
 ];
 
-export const getMenuItems = (role) => {
-  return allMenuItems.filter(item => !item.roles || item.roles.includes(role));
-};
-
-export default allMenuItems;
+export default Menuitems;
